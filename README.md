@@ -46,6 +46,30 @@ source .env.local
 image-reference-only (`pulumi config set imageTag <sha>` then `pulumi up`),
 so they are fast and never rebuild.
 
+## API routes
+
+`api` Lambda (`ANY /v1/data/{proxy+}`) — data CRUD, camelCase JSON, `{ error:
+{ code, message } }` on failure. Route groups:
+
+- **trips** — `GET /trips/active`, `GET /trips/past`, `POST /trips`,
+  `PATCH /trips/:id/property|budget-mode|budget-limit`
+- **invites** — `POST /invites`, `GET /invites`, `POST /invites/join`
+- **flights / members** — `GET|POST /trips/:id/flights`, `GET|POST /trips/:id/members`,
+  `POST /members/:id/photo`, `PATCH /members/:id/email|phone`
+- **chat / packing / expenses / places / checklist / moments / files** — full
+  CRUD under `GET|POST /trips/:id/...` with `PATCH|DELETE /:resource/:id` updates
+- **profile** — `GET|PATCH /profile/:uid`
+- **presign** — `POST /presign` → `{ uploadUrl, key }`
+
+`integrations` Lambda (`ANY /v1/integrations/{proxy+}`):
+
+- `POST /anthropic/recommendations|itinerary|receipt|scan-trip`
+- `GET /places/nearby|autocomplete|details|location`, `POST /places/enrich`
+- `GET /weather?location=…`
+
+`chat` Lambda — WebSocket `$connect` / `$disconnect` / `$default`, fan-out per
+`tripId` via the DynamoDB connection registry.
+
 ## Secrets
 
 `afterstay/db` (auto-generated master password), `afterstay/anthropic`,
@@ -64,7 +88,14 @@ read-only); see the comments in the YAML for the secrets-based fallback.
 
 ## Deployed endpoints
 
-From `pulumi stack output`: `apiUrl`, `wsUrl`, `userPoolId`,
-`userPoolClientId`. These feed the client's `EXPO_PUBLIC_API_URL`,
-`EXPO_PUBLIC_WS_URL`, `EXPO_PUBLIC_COGNITO_USER_POOL_ID`, and
-`EXPO_PUBLIC_COGNITO_CLIENT_ID` (see the client repo `afterstay-travel`).
+From `pulumi stack output` (`apiUrl`, `wsUrl`, `userPoolId`,
+`userPoolClientId`). Current live values (region `ap-southeast-1`):
+
+- REST: `https://tnrpwsjhad.execute-api.ap-southeast-1.amazonaws.com/`
+- WS: `wss://hlsw9zjpti.execute-api.ap-southeast-1.amazonaws.com/prod`
+- Cognito pool `ap-southeast-1_M1u6gpCDP`, client `1eqq2n2cbmbqfpm2n3g8slvchn`
+
+These feed the client's `EXPO_PUBLIC_API_URL`, `EXPO_PUBLIC_WS_URL`,
+`EXPO_PUBLIC_COGNITO_USER_POOL_ID`, and `EXPO_PUBLIC_COGNITO_CLIENT_ID`
+(see `afterstay-travel`). Re-run `pulumi stack output` if they change on
+redeploy.
