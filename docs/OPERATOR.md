@@ -10,7 +10,7 @@ code/IaC is already done; these need console/dashboard access.
 | GitHub | `ionnich` (`afterstay@afterstay.org`) — fork owner |
 | GitHub upstream | `peterkgumapac-dotcom` (Peter Karl Gumapac, `peterkgumapac@gmail.com`) |
 | AWS | account `755251749545`, profile `afterstay` (region `ap-southeast-1`) |
-| Google Cloud | project `afterstay-travel` (owner must be confirmed in GCP console) |
+| Google Cloud | project `afterstay-travel`; billing on the `afterstay` org account (not a personal gmail) |
 | Supabase | legacy project (to be deleted) |
 | Sentry | no project yet |
 
@@ -25,7 +25,8 @@ Every Maps Platform API (Places, Maps SDK, Geocoding, Static) currently returns
 `REQUEST_DENIED — You must enable Billing`.
 
 1. Go to `console.cloud.google.com/billing` (or project → Billing).
-2. Attach/link a billing account to the `afterstay-travel` project.
+2. Attach the **`afterstay` org's** billing account to the `afterstay-travel`
+   project (not a personal gmail account).
 3. Confirm Maps Platform APIs are enabled (APIs & Services → Enable APIs → "Maps SDK for Android", "Maps SDK for iOS", "Places API").
 4. Re-probe from any shell:
    ```bash
