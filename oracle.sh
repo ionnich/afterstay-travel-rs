@@ -30,7 +30,7 @@ Commands:
   clippy   cargo clippy --all-targets -- -D warnings
   fmt      cargo fmt
   e2e      Run end-to-end smoke checks (scripts/e2e.sh)
-  ci       fmt + clippy + test + build + push
+  ci       fmt --check + clippy + test + build + push (+ client tsc if present)
   preview  pulumi preview (infra)
   up       pulumi up --yes (infra)
   destroy  pulumi destroy --yes (infra)
@@ -90,10 +90,15 @@ cmd_deploy() {
 }
 
 cmd_ci() {
-  (cd lambdas && cargo fmt)
-  (cd lambdas && cargo clippy --all-targets -- -D warnings)
-  (cd lambdas && cargo test)
+  (cd lambdas && cargo fmt --check)
+  (cd lambdas && cargo clippy --workspace --all-targets -- -D warnings)
+  (cd lambdas && cargo test --workspace --lib --bins)
   cmd_push
+  # Client typecheck (best-effort): only when the sibling Expo app is present.
+  if [ -f "$REPO_ROOT/../afterstay-travel/package.json" ]; then
+    say "typechecking client (../afterstay-travel)..."
+    (cd "$REPO_ROOT/../afterstay-travel" && npx tsc --noEmit)
+  fi
 }
 
 case "${1:-help}" in
