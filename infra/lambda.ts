@@ -138,9 +138,10 @@ function httpRoute(crate: "api" | "integrations", routeKey: string) {
 httpRoute("api", "ANY /v1/data/{proxy+}");
 httpRoute("integrations", "ANY /v1/integrations/{proxy+}");
 
+// $default stage (no URL prefix); the /v1 versioning lives in the route paths.
 const stage = new aws.apigatewayv2.Stage("afterstay-api-stage", {
   apiId: api.id,
-  name: "v1",
+  name: "$default",
   autoDeploy: true,
 });
 

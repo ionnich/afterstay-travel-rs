@@ -4,4 +4,4 @@ config:
   afterstay:googleClientId: placeholder-google-client-id
   afterstay:googleClientSecret:
     secure: v1:84KkCovNFKvdmnsO:iAdXVwfb+xC+2eootNWTww6DYsd4ifAzmttvjM7kVN4zqAe1by/h2melhwlzgpc6
-  afterstay:imageTag: 7345b5d
+  afterstay:imageTag: e018639
