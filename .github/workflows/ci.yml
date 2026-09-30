@@ -6,9 +6,8 @@
 # only PULL the pre-built ECR images and assert they exist, so the workflow stays
 # cheap and never embeds build secrets.
 #
-# NOTE: the OIDC role below must be created first (ECR read-only + trust policy
-# for this repository's OIDC provider). Until then, uncomment the secrets-based
-# alternative in the login step.
+# OIDC role `github-actions-role` (ECR read-only, trust scoped to this repo)
+# is already provisioned. Fallback: the secrets-based login in the login step.
 
 name: CI
 
@@ -29,8 +28,7 @@ jobs:
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          # TODO: create this IAM role (ECR pull-only) before first run.
-          role-to-assume: arn:aws:iam::755251749545:role/<github-actions-role>
+          role-to-assume: arn:aws:iam::755251749545:role/github-actions-role
           role-session-name: afterstay-ci
           aws-region: ap-southeast-1
 
