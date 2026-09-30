@@ -1,0 +1,7 @@
+target/
+node_modules/
+.pulumi/
+bin/
+*.log
+.env
+.DS_Store

@@ -1,0 +1,13 @@
+{
+  "name": "afterstay-infra",
+  "private": true,
+  "dependencies": {
+    "@pulumi/aws": "^6",
+    "@pulumi/pulumi": "^3",
+    "@pulumi/random": "^4"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "typescript": "~5.9.2"
+  }
+}
