@@ -6,6 +6,15 @@ resolver = "2"
 edition = "2021"
 version = "0.1.0"
 
+# Noise lints that don't affect correctness; keep `-D warnings` meaningful.
+[workspace.lints.rust]
+deprecated = "allow"
+dead_code = "allow"
+
+[workspace.lints.clippy]
+explicit_auto_deref = "allow"
+doc_overindented_list_items = "allow"
+
 [profile.release]
 opt-level = "s"
 lto = true

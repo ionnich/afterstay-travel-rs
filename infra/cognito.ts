@@ -17,18 +17,7 @@ const userPool = new aws.cognito.UserPool("afterstay-users", {
   ],
 });
 
-const userPoolClient = new aws.cognito.UserPoolClient("afterstay-app", {
-  userPoolId: userPool.id,
-  generateSecret: false,
-  explicitAuthFlows: [
-    "ALLOW_USER_PASSWORD_AUTH",
-    "ALLOW_REFRESH_TOKEN_AUTH",
-    "ALLOW_USER_SRP_AUTH",
-  ],
-  supportedIdentityProviders: ["COGNITO", "Google"],
-});
-
-new aws.cognito.IdentityProvider("google", {
+const googleProvider = new aws.cognito.IdentityProvider("google", {
   userPoolId: userPool.id,
   providerName: "Google",
   providerType: "Google",
@@ -43,6 +32,21 @@ new aws.cognito.IdentityProvider("google", {
     name: "name",
   },
 });
+
+const userPoolClient = new aws.cognito.UserPoolClient(
+  "afterstay-app",
+  {
+    userPoolId: userPool.id,
+    generateSecret: false,
+    explicitAuthFlows: [
+      "ALLOW_USER_PASSWORD_AUTH",
+      "ALLOW_REFRESH_TOKEN_AUTH",
+      "ALLOW_USER_SRP_AUTH",
+    ],
+    supportedIdentityProviders: ["COGNITO", "Google"],
+  },
+  { dependsOn: [googleProvider] },
+);
 
 export const userPoolId = userPool.id;
 export const userPoolClientId = userPoolClient.id;

@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Source local env (AWS creds, Pulumi passphrase, backend pin) when present.
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -f "$REPO_ROOT/.env.local" ]; then
+  # shellcheck disable=SC1091
+  . "$REPO_ROOT/.env.local"
+fi
+
 REGION=${AWS_REGION:-ap-southeast-1}
 ACCOUNT=755251749545
 TAG=$(git rev-parse --short HEAD 2>/dev/null || echo dev)
@@ -51,19 +58,25 @@ cmd_build() {
   (cd lambdas && cargo lambda build --release --arm64)
   for crate in "${CRATES[@]}"; do
     say "building image afterstay/$crate:$TAG"
-    docker build --build-arg CRATE="$crate" -t "afterstay/$crate:$TAG" lambdas/
+    docker build --provenance=false --build-arg CRATE="$crate" -t "afterstay/$crate:$TAG" lambdas/
   done
 }
 
 cmd_push() {
   cmd_build
-  say "logging in to ECR ($ECR)..."
-  aws ecr get-login-password --region "$REGION" \
-    | docker login --username AWS --password-stdin "$ECR" >/dev/null
+  # Write ECR auth directly into a plaintext docker config (skip `docker login`,
+  # which shells out to the blocked osxkeychain helper).
+  local dcfg="${TMPDIR:-/tmp}/afterstay-docker-config"
+  mkdir -p "$dcfg"
+  local pw auth
+  pw="$(aws ecr get-login-password --region "$REGION")"
+  auth="$(printf 'AWS:%s' "$pw" | base64)"
+  printf '{"auths":{"%s":{"auth":"%s"}}}' "$ECR" "$auth" > "$dcfg/config.json"
+  say "pushing to ECR ($ECR)..."
   for crate in "${CRATES[@]}"; do
     for t in "$TAG" latest; do
       docker tag "afterstay/$crate:$TAG" "$ECR/afterstay/$crate:$t"
-      docker push "$ECR/afterstay/$crate:$t"
+      DOCKER_CONFIG="$dcfg" docker push "$ECR/afterstay/$crate:$t"
     done
   done
 }

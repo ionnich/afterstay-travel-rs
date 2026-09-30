@@ -26,7 +26,7 @@ const dbPassword = new random.RandomPassword("afterstay-db-password", {
 
 const db = new aws.rds.Instance("afterstay-db", {
   engine: "postgres",
-  engineVersion: "16.4",
+  engineVersion: "16.15",
   instanceClass: "db.t4g.small",
   dbName: "afterstay",
   username: "afterstay_admin",
@@ -44,7 +44,7 @@ const db = new aws.rds.Instance("afterstay-db", {
 export const rdsAddress = db.address;
 export const rdsEndpoint = db.endpoint;
 
-const dbSecret = new aws.secretsmanager.Secret("afterstay/db", {
+export const dbSecret = new aws.secretsmanager.Secret("afterstay/db", {
   name: "afterstay/db",
 });
 
