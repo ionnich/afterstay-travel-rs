@@ -7,7 +7,7 @@ code/IaC is already done; these need console/dashboard access.
 
 | Surface | Identity |
 |---|---|
-| GitHub | `ionnich` (Aaron Nicholas, `aarn.gmpc@gmail.com`) — fork owner |
+| GitHub | `ionnich` (`afterstay@afterstay.org`) — fork owner |
 | GitHub upstream | `peterkgumapac-dotcom` (Peter Karl Gumapac, `peterkgumapac@gmail.com`) |
 | AWS | account `755251749545`, profile `afterstay` (region `ap-southeast-1`) |
 | Google Cloud | project `afterstay-travel` (owner must be confirmed in GCP console) |
