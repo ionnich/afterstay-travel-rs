@@ -44,9 +44,21 @@ const userPoolClient = new aws.cognito.UserPoolClient(
       "ALLOW_USER_SRP_AUTH",
     ],
     supportedIdentityProviders: ["COGNITO", "Google"],
+    allowedOauthFlows: ["code"],
+    allowedOauthScopes: ["openid", "email", "profile"],
+    callbackUrls: ["afterstay://auth/callback"],
+    logoutUrls: ["afterstay://auth/login"],
   },
   { dependsOn: [googleProvider] },
 );
 
+// Hosted-UI domain — Google OAuth redirect target is
+// https://<domain>.auth.ap-southeast-1.amazoncognito.com/oauth2/idpresponse
+const userPoolDomain = new aws.cognito.UserPoolDomain("afterstay-users-domain", {
+  userPoolId: userPool.id,
+  domain: "afterstay-users",
+});
+
 export const userPoolId = userPool.id;
 export const userPoolClientId = userPoolClient.id;
+export const oauthDomain = pulumi.interpolate`${userPoolDomain.domain}.auth.ap-southeast-1.amazoncognito.com`;
