@@ -10,7 +10,7 @@ code/IaC is already done; these need console/dashboard access.
 | GitHub | `ionnich` (commits attributed to `ionnich`, author `aarn.gmpc@gmail.com`) — fork owner |
 | GitHub upstream | `peterkgumapac-dotcom` (Peter Karl Gumapac, `peterkgumapac@gmail.com`) |
 | AWS | account `755251749545`, profile `afterstay` (region `ap-southeast-1`) |
-| Google Cloud | project `afterstay-travel`; provider/billing = `afterstay@afterstay.org` |
+| Google Cloud | billing account `011C65-BBC99B-0663B6` ("Afterstay", org `afterstay.org`); Maps/Places key `AIzaSyAP7o2A…` lives on project `core-outrider-493623-i2` ("My First Project"); Firebase/identity project is `afterstay-travel` (704335704962) |
 | Supabase | legacy project (to be deleted) |
 | Sentry | no project yet |
 
@@ -19,23 +19,12 @@ The GCP project's billing owner is not determinable from the repo — open
 
 ---
 
-## 1. Enable GCP billing (blocks Maps + Places) ⚠️ highest priority
+## 1. Enable GCP billing (blocks Maps + Places) ✅ DONE
 
-Every Maps Platform API (Places, Maps SDK, Geocoding, Static) currently returns
-`REQUEST_DENIED — You must enable Billing`.
-
-1. Go to `console.cloud.google.com/billing` (or project → Billing).
-2. Attach billing under the `afterstay` account — **`afterstay@afterstay.org`**
-   (a real mailbox), not a personal gmail account.
-3. Confirm Maps Platform APIs are enabled (APIs & Services → Enable APIs → "Maps SDK for Android", "Maps SDK for iOS", "Places API").
-4. Re-probe from any shell:
-   ```bash
-   curl -s "https://maps.googleapis.com/maps/api/geocode/json?address=Boracay&key=AIzaSyAP7o2AvozqxFyoniXjKAgkDkS5sFOmnvc" | jq .status
-   ```
-   Expect `"OK"`, not `"REQUEST_DENIED"`.
-
-The same key `AIzaSyAP7o2A…` is then reusable for **both** Places (server) and
-Maps SDK (client tiles) — no new key needed.
+Billing account `011C65-BBC99B-0663B6` ("Afterstay") is linked to the key's
+project **`core-outrider-493623-i2`** ("My First Project" — rename it to
+`afterstay-maps` for clarity), and the 4 Maps APIs are enabled. Geocoding +
+Places + Static Maps all return `OK` with key `AIzaSyAP7o2A…`.
 
 ---
 
