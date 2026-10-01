@@ -30,20 +30,27 @@ Places + Static Maps all return `OK` with key `AIzaSyAP7o2A…`.
 
 ## 2. Google OAuth (Cognito Google sign-in)
 
-1. `console.cloud.google.com` → APIs & Services → Credentials → Create
-   Credentials → **OAuth client ID** → type **Web application**.
-2. Set the authorized redirect URI to the Cognito domain
-   `https://<your-pool-domain>.auth.ap-southeast-1.amazoncognito.com/oauth2/idpresponse`.
-3. Record the **Client ID** (`*.apps.googleusercontent.com`) and **Client Secret**
-   (`GOCSPX-…`).
-4. Wire into infra + client:
+Cognito domain `afterstay-users` + OAuth callback/logout URLs are already wired
+in `infra/cognito.ts` (deployed on next `pulumi up`). Remaining: create the GCP
+OAuth client and provide id + secret.
+
+1. `console.cloud.google.com` → project `afterstay-travel`.
+2. **APIs & Services → OAuth consent screen**: type External; app name
+   "AfterStay"; support email `afterstay@afterstay.org`; authorized domains
+   `afterstay.org`; scopes `openid email profile`; add yourself as a test user.
+3. **Credentials → Create Credentials → OAuth client ID** → **Web application**.
+4. Authorized redirect URI (exact):
+   `https://afterstay-users.auth.ap-southeast-1.amazoncognito.com/oauth2/idpresponse`
+5. Copy **Client ID** (`*.apps.googleusercontent.com`) and **Client Secret**
+   (`GOCSPX-…`) → give to the agent.
+6. Agent runs:
    ```bash
-   # backend (afterstay-travel-rs), then `pulumi up`
-   pulumi config set googleClientId "<client-id>"   --stack afterstay
-   pulumi config set googleClientSecret "<secret>"  --stack afterstay
+   pulumi config set googleClientId "<client-id>" --stack afterstay
+   pulumi config set googleClientSecret "<secret>" --secret --stack afterstay
+   pulumi up --yes
    # client .env
    EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID=<client-id>
-   EXPO_PUBLIC_COGNITO_OAUTH_DOMAIN=<your-pool-domain>.auth.ap-southeast-1.amazoncognito.com
+   EXPO_PUBLIC_COGNITO_OAUTH_DOMAIN=afterstay-users.auth.ap-southeast-1.amazoncognito.com
    ```
 
 ---
