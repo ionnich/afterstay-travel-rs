@@ -1,7 +1,7 @@
 encryptionsalt: v1:fru8Q9it4QE=:v1:3HbMfweCAlZALdSX:4j5NYabVh4pfT0vQUegY7s1JBuACVQ==
 config:
   aws:region: ap-southeast-1
-  afterstay:googleClientId: placeholder-google-client-id
+  afterstay:googleClientId: 704335704962-1i9h84d3qogmabg3b6ndsta9llo1hf7e.apps.googleusercontent.com
   afterstay:googleClientSecret:
-    secure: v1:84KkCovNFKvdmnsO:iAdXVwfb+xC+2eootNWTww6DYsd4ifAzmttvjM7kVN4zqAe1by/h2melhwlzgpc6
+    secure: v1:pAin9B8d6WUWBW3g:PqMKsMleqgMDXEO+vvTo/lJ0CxRVkdM4bXVXlPzyD9X0p3raBj5hQXca/HT9tTVYGY7j
   afterstay:imageTag: e018639
