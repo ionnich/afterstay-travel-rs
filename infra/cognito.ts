@@ -44,6 +44,7 @@ const userPoolClient = new aws.cognito.UserPoolClient(
       "ALLOW_USER_SRP_AUTH",
     ],
     supportedIdentityProviders: ["COGNITO", "Google"],
+    allowedOauthFlowsUserPoolClient: true,
     allowedOauthFlows: ["code"],
     allowedOauthScopes: ["openid", "email", "profile"],
     callbackUrls: ["afterstay://auth/callback"],
