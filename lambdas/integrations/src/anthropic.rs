@@ -249,7 +249,7 @@ pub async fn generate_itinerary(
     } else {
         args.trip_days.unwrap_or(7)
     };
-    let today_str = short_date(pht_today());
+    let today_str = short_date(utc_today());
     let start_date_str = args
         .start_date
         .as_deref()
@@ -453,12 +453,12 @@ Return ONLY a JSON object (no prose, no code fences):
   "flights": [
     {
       "direction": "Outbound",
-      "flightNumber": "5J 123",
-      "airline": "Cebu Pacific",
-      "from": "Manila (MNL)",
-      "to": "Kalibo (KLO)",
-      "departTime": "2026-04-20T06:00:00+08:00",
-      "arriveTime": "2026-04-20T07:05:00+08:00",
+      "flightNumber": "BA 276",
+      "airline": "British Airways",
+      "from": "New York (JFK)",
+      "to": "Paris (CDG)",
+      "departTime": "2026-04-20T06:00:00-04:00",
+      "arriveTime": "2026-04-20T07:05:00+02:00",
       "bookingRef": "XYZ789"
     }
   ],
@@ -467,7 +467,7 @@ Return ONLY a JSON object (no prose, no code fences):
 
 Rules:
 - Extract as much as you can from the images. Leave fields empty/null if not found.
-- Dates must be YYYY-MM-DD format. Times must include timezone offset (+08:00 for Philippines).
+- Dates must be YYYY-MM-DD format. Times must include a timezone offset (e.g. -04:00, +09:00).
 - If multiple flights found, include all of them with correct direction (Outbound or Return).
 - If you see passenger names, list them in "members".
 - Cost should be numeric (no currency symbol). Currency as ISO code.
@@ -560,8 +560,8 @@ fn strip_fences(text: &str) -> String {
     text.to_string()
 }
 
-fn pht_today() -> chrono::NaiveDate {
-    (chrono::Utc::now() + chrono::Duration::hours(8)).date_naive()
+fn utc_today() -> chrono::NaiveDate {
+    chrono::Utc::now().date_naive()
 }
 
 fn short_date(d: chrono::NaiveDate) -> String {

@@ -15,7 +15,7 @@ use sqlx::types::BigDecimal;
 use uuid::Uuid;
 
 use core::error::ApiError;
-use core::time::{ensure_pht_offset, parse_date_pht};
+use core::time::{ensure_utc_offset, parse_date};
 
 use crate::{ok, ok_body, parse_uuid, Ctx};
 
@@ -35,16 +35,14 @@ fn to_f64(b: Option<BigDecimal>) -> Option<f64> {
 }
 
 fn parse_dt(s: &str) -> Result<DateTime<Utc>, ApiError> {
-    let iso = ensure_pht_offset(s)?;
+    let iso = ensure_utc_offset(s)?;
     DateTime::parse_from_rfc3339(&iso)
         .map(|dt| dt.with_timezone(&Utc))
         .map_err(|_| ApiError::BadRequest(format!("invalid datetime: {s}")))
 }
 
-fn pht_today() -> NaiveDate {
-    chrono::Utc::now()
-        .with_timezone(&chrono::FixedOffset::east_opt(8 * 3600).expect("valid offset"))
-        .date_naive()
+fn utc_today() -> NaiveDate {
+    chrono::Utc::now().date_naive()
 }
 
 fn query_param(req: &Request, name: &str) -> Option<String> {
@@ -606,10 +604,10 @@ pub async fn get_active_trip(ctx: &Ctx<'_>) -> Result<Response<Body>, ApiError> 
 
 pub async fn create_trip(ctx: &Ctx<'_>, req: &Request) -> Result<Response<Body>, ApiError> {
     let input: CreateTripBody = body(req).await?;
-    let start = parse_date_pht(&input.start_date)?;
-    let end = parse_date_pht(&input.end_date)?;
+    let start = parse_date(&input.start_date)?;
+    let end = parse_date(&input.end_date)?;
 
-    let today = pht_today();
+    let today = utc_today();
     let status = if today > end {
         "Completed"
     } else if today >= start {
@@ -1023,7 +1021,7 @@ pub async fn add_expense(
 ) -> Result<Response<Body>, ApiError> {
     ctx.assert_member(trip_id).await?;
     let b: AddExpenseBody = body(req).await?;
-    let date = parse_date_pht(&b.date)?;
+    let date = parse_date(&b.date)?;
     sqlx::query(
         "INSERT INTO expenses (trip_id, title, amount, currency, category, expense_date, \
          paid_by, photo_url, place_name, split_type, notes) \
@@ -1054,7 +1052,7 @@ pub async fn update_expense(
     let b: UpdateExpenseBody = body(req).await?;
     let trip_id = trip_id_of(ctx, "expenses", expense_id).await?;
     ctx.assert_member(trip_id).await?;
-    let date = b.date.as_deref().map(parse_date_pht).transpose()?;
+    let date = b.date.as_deref().map(parse_date).transpose()?;
 
     sqlx::query(
         "UPDATE expenses SET title = COALESCE($1, title), amount = COALESCE($2, amount), \
@@ -1230,7 +1228,7 @@ pub async fn add_moment(
 ) -> Result<Response<Body>, ApiError> {
     ctx.assert_member(trip_id).await?;
     let b: AddMomentBody = body(req).await?;
-    let date = parse_date_pht(&b.date)?;
+    let date = parse_date(&b.date)?;
     sqlx::query(
         "INSERT INTO moments (trip_id, caption, public_url, location, uploaded_by, taken_at, tags) \
          VALUES ($1,$2,$3,$4,$5,$6,$7)",
