@@ -104,11 +104,19 @@ async fn dispatch(req: &Request, state: &State) -> Result<Response<Body>, ApiErr
         ("GET", "/places/nearby") => {
             let type_ = query_param(query, "type");
             let keyword = query_param(query, "keyword");
+            let lat = query_param(query, "lat").and_then(|v| v.parse::<f64>().ok());
+            let lng = query_param(query, "lng").and_then(|v| v.parse::<f64>().ok());
+            let (lat, lng) = match (lat, lng) {
+                (Some(lat), Some(lng)) => (Some(lat), Some(lng)),
+                _ => (None, None),
+            };
             let results = places::search_nearby(
                 &state.client,
                 &state.secrets.google_places_key,
                 type_.as_deref(),
                 keyword.as_deref(),
+                lat,
+                lng,
             )
             .await?;
             json(200, &results)

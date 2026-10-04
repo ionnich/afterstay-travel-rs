@@ -92,12 +92,18 @@ pub async fn search_nearby(
     key: &str,
     type_: Option<&str>,
     keyword: Option<&str>,
+    lat: Option<f64>,
+    lng: Option<f64>,
 ) -> Result<Vec<NearbyPlace>, ApiError> {
     require_key(key, "Google Places")?;
+    let (lat, lng) = match (lat, lng) {
+        (Some(lat), Some(lng)) => (lat, lng),
+        _ => (HOTEL_LAT, HOTEL_LNG),
+    };
     let mut url = places_url("nearbysearch/json");
     {
         let mut q = url.query_pairs_mut();
-        q.append_pair("location", &format!("{HOTEL_LAT},{HOTEL_LNG}"));
+        q.append_pair("location", &format!("{lat},{lng}"));
         q.append_pair("radius", "1500");
         q.append_pair("key", key);
         if let Some(t) = type_ {
