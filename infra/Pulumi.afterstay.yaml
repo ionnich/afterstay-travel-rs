@@ -4,4 +4,4 @@ config:
   afterstay:googleClientId: 704335704962-1i9h84d3qogmabg3b6ndsta9llo1hf7e.apps.googleusercontent.com
   afterstay:googleClientSecret:
     secure: v1:pAin9B8d6WUWBW3g:PqMKsMleqgMDXEO+vvTo/lJ0CxRVkdM4bXVXlPzyD9X0p3raBj5hQXca/HT9tTVYGY7j
-  afterstay:imageTag: e018639
+  afterstay:imageTag: a292555

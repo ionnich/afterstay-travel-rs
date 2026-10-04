@@ -4,10 +4,6 @@ use serde::{Deserialize, Serialize};
 
 use core::error::ApiError;
 
-const HOTEL_LAT: f64 = 11.9710;
-const HOTEL_LNG: f64 = 121.9215;
-const DEFAULT_LOCATION: &str = "Boracay, Philippines";
-
 // ── Output types (JSON wire format == lib/google-places.ts) ────────────────
 
 #[derive(Debug, Serialize)]
@@ -98,7 +94,7 @@ pub async fn search_nearby(
     require_key(key, "Google Places")?;
     let (lat, lng) = match (lat, lng) {
         (Some(lat), Some(lng)) => (lat, lng),
-        _ => (HOTEL_LAT, HOTEL_LNG),
+        _ => return Ok(Vec::new()), // no trip coords → no results; never guess a location
     };
     let mut url = places_url("nearbysearch/json");
     {
@@ -279,8 +275,6 @@ pub async fn place_autocomplete(
     let mut url = places_url("autocomplete/json");
     url.query_pairs_mut()
         .append_pair("input", input)
-        .append_pair("location", &format!("{HOTEL_LAT},{HOTEL_LNG}"))
-        .append_pair("radius", "5000")
         .append_pair("key", key);
 
     let data = get_json(client, url).await?;
@@ -359,10 +353,9 @@ async fn search_place(
     key: &str,
     query: &str,
 ) -> Result<Option<PlaceSearchResult>, ApiError> {
-    let input = format!("{query} {DEFAULT_LOCATION}");
     let mut url = places_url("findplacefromtext/json");
     url.query_pairs_mut()
-        .append_pair("input", &input)
+        .append_pair("input", query)
         .append_pair("inputtype", "textquery")
         .append_pair(
             "fields",
